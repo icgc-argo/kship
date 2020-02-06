@@ -59,7 +59,7 @@ spec:
 
                     // the network=host needed to download dependencies using the host network (since we are inside 'docker'
                     // container)
-                    sh "docker build --network=host -f ci-cd/Dockerfile . -t icgcargo/kship:edge -t icgcargo/kship:${version}-${commit}"
+                    sh "docker build --network=host . -t icgcargo/kship:edge -t icgcargo/kship:${version}-${commit}"
                     sh "docker push icgcargo/kship:${version}-${commit}"
                     sh "docker push icgcargo/kship:edge"
                 }
