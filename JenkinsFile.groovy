@@ -12,7 +12,6 @@ spec:
   - name: jdk
     tty: true
     image: openjdk:11-jdk
-    env:
   - name: docker
     image: docker:18-git
     tty: true
