@@ -1,0 +1,41 @@
+server:
+  port: 3518
+
+kship:
+  http:
+    # locally this calls the http bin in docker compose file
+    url: http://localhost:3005/post
+  security:
+    clientId:
+    clientSecret:
+
+logging:
+  level:
+    root: INFO
+
+spring:
+  output.ansi.enabled: ALWAYS
+
+  application:
+    name: kship-01
+
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+        bindings:
+          input:
+            consumer:
+              enableDlq: true
+              dlqName: kship-01-dlq
+              autoCommitOnError: false
+              autoCommitOffset: true
+      bindings:
+        input:
+          # we don't specify content type because @StreamListener will handle that
+          destination: source-topic
+          group: kship-cg-01
+          consumer:
+            maxAttempts: 9999999
+
