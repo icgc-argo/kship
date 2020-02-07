@@ -12,4 +12,4 @@ RUN ./mvnw clean package
 FROM openjdk:11-jre-slim
 COPY --from=builder /usr/src/app/target/kship-*.jar /usr/bin/kship.jar
 CMD ["java", "-ea", "-jar", "/usr/bin/kship.jar"]
-EXPOSE 8080/tcp
+EXPOSE 3518

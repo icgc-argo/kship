@@ -11,7 +11,12 @@ kship:
 
 logging:
   level:
-    root: INFO
+    root: DEBUG
+    org.apache.kafka: INFO
+    org.springframework.retry.support: DEBUG
+    org.springframework.kafka.listener: INFO
+    org.apache.kafka.clients: WARN
+    io.netty: INFO
 
 spring:
   output.ansi.enabled: ALWAYS
@@ -29,13 +34,14 @@ spring:
             consumer:
               enableDlq: true
               dlqName: kship-01-dlq
-              autoCommitOnError: false
+              # this means we commit the offset when the message is moved to the dlq
+              autoCommitOnError: true
+              # this means we commit the offset when message processed successfully
               autoCommitOffset: true
       bindings:
         input:
-          # we don't specify content type because @StreamListener will handle that
           destination: source-topic
           group: kship-cg-01
           consumer:
-            maxAttempts: 9999999
+            maxAttempts: 9000
 

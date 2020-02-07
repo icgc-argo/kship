@@ -19,30 +19,37 @@ import org.springframework.web.reactive.function.client.WebClient;
 @EnableBinding(Sink.class)
 public class ConsumerToHttp implements Shipper {
 
-    private WebClient client;
+  private WebClient client;
 
-    public ConsumerToHttp(@Value("${kship.http.url}") String targetUrl,
-                          @Value("${kship.security.clientId}") String clientId,
-                          @Value("${kship.security.clientSecret}") String clientSecret) {
-        val wcb = WebClient.builder()
-            .baseUrl(targetUrl);
+  public ConsumerToHttp(@Value("${kship.http.url}") String targetUrl,
+                        @Value("${kship.security.clientId}") String clientId,
+                        @Value("${kship.security.clientSecret}") String clientSecret) {
+    val wcb = WebClient.builder()
+        .baseUrl(targetUrl);
 
-        if (!StringUtils.isEmpty(clientId) && !StringUtils.isEmpty(clientSecret)) {
-          String credentials = clientId + ":" + clientSecret;
-          wcb.defaultHeader("Authorization", "Basic " + new String(Base64Utils.encode(credentials.getBytes())));
-        }
-        this.client = wcb.build();;
+    if (!StringUtils.isEmpty(clientId) && !StringUtils.isEmpty(clientSecret)) {
+      String credentials = clientId + ":" + clientSecret;
+      wcb.defaultHeader("Authorization", "Basic " + new String(Base64Utils.encode(credentials.getBytes())));
     }
+    this.client = wcb.build();
+    ;
+  }
 
-    @StreamListener(Sink.INPUT)
-    public void ship(@Payload JsonNode message) {
-        client.post()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(message)
-                .retrieve()
-                .bodyToMono(JsonNode.class)
-                .subscribe(r -> {
-                    System.out.println(r.toPrettyString());
-                });
+  @StreamListener(Sink.INPUT)
+  public void ship(@Payload JsonNode message) {
+    log.debug("received a message : " + message.toPrettyString());
+    val res = client.post()
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(message)
+        .retrieve()
+        .bodyToMono(JsonNode.class)
+        // we want this to block the main consumer thread so error handling works
+        // as expected in cloud stream (we want to propagate errors up).
+        .block();
+
+    log.debug("shipped the message");
+    if (res != null) {
+      log.debug("response body was : " + res.toPrettyString());
     }
+  }
 }
