@@ -20,8 +20,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 public class ConsumerToHttpTest {
   @Autowired
   private Sink sink;
-  @Autowired
-  private ConsumerToHttp shipper;
 
   @Test
   @SneakyThrows

@@ -4,10 +4,9 @@ server:
 kship:
   http:
     # locally this calls the http bin in docker compose file
-    url: http://localhost:3005/post
-  security:
-    clientId:
-    clientSecret:
+    url: http://localhost:9000/kafka/target-topic
+    security:
+      enabled: 'true' # this controls which webclient bean to use
 
 logging:
   level:
@@ -19,6 +18,17 @@ logging:
     io.netty: INFO
 
 spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          ego:
+            token-uri: https://ego.dev.argo.cancercollaboratory.org/api/oauth/token
+        registration:
+          ego-client:
+            client-id: kship
+            client-secret: kship
+
   output.ansi.enabled: ALWAYS
 
   application:
