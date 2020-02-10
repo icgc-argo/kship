@@ -26,8 +26,8 @@ spring:
             token-uri: https://ego.dev.argo.cancercollaboratory.org/api/oauth/token
         registration:
           ego-client:
-            client-id: kship
-            client-secret: kship
+            client-id: client-id
+            client-secret: client-secret
 
   output.ansi.enabled: ALWAYS
 
