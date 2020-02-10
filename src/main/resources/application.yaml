@@ -1,0 +1,57 @@
+server:
+  port: 3518
+
+kship:
+  http:
+    # locally this calls the http bin in docker compose file
+    url: http://localhost:9000/kafka/target-topic
+    security:
+      enabled: 'true' # this controls which webclient bean to use
+
+logging:
+  level:
+    root: DEBUG
+    org.apache.kafka: INFO
+    org.springframework.retry.support: DEBUG
+    org.springframework.kafka.listener: INFO
+    org.apache.kafka.clients: WARN
+    io.netty: INFO
+
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          ego:
+            token-uri: https://ego.dev.argo.cancercollaboratory.org/api/oauth/token
+        registration:
+          ego-client:
+            client-id: client-id
+            client-secret: client-secret
+
+  output.ansi.enabled: ALWAYS
+
+  application:
+    name: kship-01
+
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+        bindings:
+          input:
+            consumer:
+              enableDlq: true
+              dlqName: kship-01-dlq
+              # this means we commit the offset when the message is moved to the dlq
+              autoCommitOnError: true
+              # this means we commit the offset when message processed successfully
+              autoCommitOffset: true
+      bindings:
+        input:
+          destination: source-topic
+          group: kship-cg-01
+          consumer:
+            maxAttempts: 9000
+
