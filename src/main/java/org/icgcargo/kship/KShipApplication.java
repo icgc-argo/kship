@@ -25,43 +25,42 @@ public class KShipApplication {
 @ConditionalOnProperty("kship.http.url")
 class ConsumerToHttpConfig {
 
-  //https://manhtai.github.io/posts/spring-webclient-oauth2-client-credentials/
+  // https://manhtai.github.io/posts/spring-webclient-oauth2-client-credentials/
   @Bean
   @ConditionalOnProperty(value = "kship.http.security.enabled", havingValue = "true")
   ReactiveClientRegistrationRepository getRegistration(
       @Value("${spring.security.oauth2.client.provider.ego.token-uri}") String tokenUri,
       @Value("${spring.security.oauth2.client.registration.ego-client.client-id}") String clientId,
-      @Value("${spring.security.oauth2.client.registration.ego-client.client-secret}") String clientSecret
-  ) {
-    ClientRegistration registration = ClientRegistration
-        .withRegistrationId("ego-client")
-        .tokenUri(tokenUri)
-        .clientId(clientId)
-        .clientSecret(clientSecret)
-        .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-        .build();
+      @Value("${spring.security.oauth2.client.registration.ego-client.client-secret}")
+          String clientSecret) {
+    ClientRegistration registration =
+        ClientRegistration.withRegistrationId("ego-client")
+            .tokenUri(tokenUri)
+            .clientId(clientId)
+            .clientSecret(clientSecret)
+            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+            .build();
     return new InMemoryReactiveClientRegistrationRepository(registration);
   }
+
   @Bean()
   @ConditionalOnProperty(value = "kship.http.security.enabled", havingValue = "true")
-  WebClient secureWebClient(ReactiveClientRegistrationRepository clientRegistrations,
-                      @Value("${kship.http.url}") String targetUrl) {
+  WebClient secureWebClient(
+      ReactiveClientRegistrationRepository clientRegistrations,
+      @Value("${kship.http.url}") String targetUrl) {
 
-    ServerOAuth2AuthorizedClientExchangeFilterFunction oauth = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
-        clientRegistrations, new UnAuthenticatedServerOAuth2AuthorizedClientRepository());
+    ServerOAuth2AuthorizedClientExchangeFilterFunction oauth =
+        new ServerOAuth2AuthorizedClientExchangeFilterFunction(
+            clientRegistrations, new UnAuthenticatedServerOAuth2AuthorizedClientRepository());
 
     oauth.setDefaultClientRegistrationId("ego-client");
 
-    return WebClient.builder()
-        .filter(oauth)
-        .baseUrl(targetUrl)
-        .build();
+    return WebClient.builder().filter(oauth).baseUrl(targetUrl).build();
   }
+
   @Bean()
   @ConditionalOnProperty(value = "kship.http.security.enabled", havingValue = "false")
   WebClient insecureWebClient(@Value("${kship.http.url}") String targetUrl) {
-    return WebClient.builder()
-        .baseUrl(targetUrl)
-        .build();
+    return WebClient.builder().baseUrl(targetUrl).build();
   }
 }
