@@ -12,7 +12,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
-
 @EnableBinding(Sink.class)
 public class ConsumerToHttp implements Shipper {
 
@@ -26,14 +25,16 @@ public class ConsumerToHttp implements Shipper {
   public void ship(@Payload JsonNode message) {
     log.debug("received a message : " + message.toPrettyString());
     try {
-      val res = client.post()
-          .contentType(MediaType.APPLICATION_JSON)
-          .bodyValue(message)
-          .retrieve()
-          .bodyToMono(JsonNode.class)
-          // we want this to block the main consumer thread so error handling works
-          // as expected in cloud stream (we want to propagate errors up).
-          .block();
+      val res =
+          client
+              .post()
+              .contentType(MediaType.APPLICATION_JSON)
+              .bodyValue(message)
+              .retrieve()
+              .bodyToMono(JsonNode.class)
+              // we want this to block the main consumer thread so error handling works
+              // as expected in cloud stream (we want to propagate errors up).
+              .block();
 
       log.debug("shipped the message");
       if (res != null) {
@@ -45,4 +46,3 @@ public class ConsumerToHttp implements Shipper {
     }
   }
 }
-
