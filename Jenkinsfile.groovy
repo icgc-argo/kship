@@ -53,28 +53,6 @@ spec:
             }
         }
 
-// BEGINNING OF TEST BLOCK
-// DELETE BEFORE PR
-        stage('Test publish to ghcr.io') {
-            when {
-                branch "Docker-image-ghcr-migration"
-            }
-            steps {
-                container('docker') {
-                    withCredentials([usernamePassword(credentialsId:'argoContainers', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh "docker login ${dockerRegistry} -u $USERNAME -p $PASSWORD"
-                    }
-
-                    // the network=host needed to download dependencies using the host network (since we are inside 'docker'
-                    // container)
-                    sh "docker build --network=host . -t ${dockerRegistry}/${githubRepo}:edge -t ${dockerRegistry}/${githubRepo}:${version}-${commit}"
-                    sh "docker push ${dockerRegistry}/${githubRepo}:${version}-${commit}"
-                    sh "docker push ${dockerRegistry}/${githubRepo}:edge"
-                }
-            }
-        }
-// END OF TEST BLOCK
-
         // publish the edge tag
         stage('Publish Develop') {
             when {
