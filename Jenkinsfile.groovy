@@ -79,12 +79,12 @@ spec:
             }
             steps {
                 container('docker') {
-                    withCredentials([usernamePassword(credentialsId: 'argoContainers', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    withCredentials([usernamePassword(credentialsId: 'argoGithub', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         sh "git tag ${version}"
                         sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${githubRepo} --tags"
                     }
 
-                    withCredentials([usernamePassword(credentialsId:'argoDockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId:'argoContainers', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh "docker login ${dockerRegistry} -u $USERNAME -p $PASSWORD"
                     }
                     // DNS error if --network is default
