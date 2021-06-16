@@ -10,7 +10,7 @@ kship:
 
 logging:
   level:
-    root: DEBUG
+    root: INFO
     org.apache.kafka: INFO
     org.springframework.retry.support: DEBUG
     org.springframework.kafka.listener: INFO
